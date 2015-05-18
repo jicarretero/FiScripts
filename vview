@@ -1,0 +1,17 @@
+#!/bin/bash
+
+[ -z $1 ] && exit 1
+
+#unset OS_TENANT_ID
+#unset OS_TENANT_NAME
+#export OS_REGION_NAME=
+#export OS_USERNAME=
+#export OS_PASSWORD=
+#export OS_AUTH_URL=
+#export OS_TENANT_NAME=
+
+a=(`nova show $1 | grep -v "+--*+--*+$" |sed 's.|..g' | awk '$1=="OS-EXT-SRV-ATTR:hypervisor_hostname" || $1=="id" {print $2}'`)
+hn=${a[0]}
+ip=`awk "/$hn\$/ {print \\$1}" /etc/hosts`
+
+(virt-viewer -c qemu+ssh://root@$ip/system ${a[1]} & )
